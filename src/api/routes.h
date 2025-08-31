@@ -1,0 +1,8 @@
+//
+// Created by fkkha on 31/08/2025.
+//
+
+#ifndef INVENTORY_SYSTEM_ROUTES_H
+#define INVENTORY_SYSTEM_ROUTES_H
+
+#endif //INVENTORY_SYSTEM_ROUTES_H
