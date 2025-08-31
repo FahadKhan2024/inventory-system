@@ -1,3 +1,0 @@
-C:/Users/fkkha/CLionProjects/inventory-system/cmake-build-debug/CMakeFiles/inventory_system.dir
-C:/Users/fkkha/CLionProjects/inventory-system/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/fkkha/CLionProjects/inventory-system/cmake-build-debug/CMakeFiles/rebuild_cache.dir
