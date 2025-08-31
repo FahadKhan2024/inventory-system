@@ -6,6 +6,8 @@
 #include <fstream>
 #include <stdexcept>
 
+bool Database::initialised = false;
+sqlite3* Database::db = nullptr;
 
 void Database::initialise(const std::string &dbPath) {
     if (initialised) return;

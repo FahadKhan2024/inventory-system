@@ -8,7 +8,9 @@ find_package(Crow CONFIG REQUIRED)
 find_package(SQLite3 REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
-add_executable(inventory_system main.cpp src/database/connection.h src/database/connection.cpp src/database/models/product.h src/database/models/product.cpp src/api/controllers/product_controller.h src/api/controllers/product.controller.cpp src/api/routes.h src/api/routes.cpp)
+add_executable(inventory_system main.cpp src/database/connection.h src/database/connection.cpp src/database/models/product.h src/database/models/product.cpp src/api/controllers/product_controller.h src/api/controllers/product.controller.cpp src/api/routes.h src/api/routes.cpp
+        src/database/connection.cpp
+        src/database/connection.cpp)
 
 target_link_libraries(inventory_system
         Crow::Crow
