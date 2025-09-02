@@ -10,13 +10,12 @@ Product Product::fromJson(const nlohmann::json &j) {
     Product product;
 
     if (j.contains("id")) product.id = j["id"];
-    if (j.contains("sku")) product.id = j["sku"];
-    if (j.contains("name")) product.id = j["name"];
-    if (j.contains("description")) product.id = j["description"];
-    if (j.contains("price")) product.id = j["price"];
-    if (j.contains("quantity")) product.id = j["quantity"];
-    if (j.contains("min_quantity")) product.id = j["min_quantity"];
-    if (j.contains("id")) product.id = j["id"];
+    if (j.contains("sku")) product.sku = j["sku"];
+    if (j.contains("name")) product.name = j["name"];
+    if (j.contains("description")) product.description = j["description"];
+    if (j.contains("price")) product.price = j["price"];
+    if (j.contains("quantity")) product.quantity = j["quantity"];
+    if (j.contains("min_quantity")) product.min_quantity = j["min_quantity"];
 
     return product;
 }
@@ -35,16 +34,14 @@ nlohmann::json Product::toJson() const {
 
 std::vector<Product> Product::getAllProducts() {
     std::vector<Product> products;
-
     sqlite3* db = Database::getConnection();
+    sqlite3_stmt* stmt = nullptr;
 
     const char* sql = R"(
         SELECT id, sku, name, description, price, quantity, min_quantity
         FROM products
         ORDER BY name
     )";
-
-    sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -67,26 +64,24 @@ std::vector<Product> Product::getAllProducts() {
 
             products.push_back(product);
         }
+        sqlite3_finalize(stmt);
     } else {
-        std::cerr << "SQL error in getAllProducts" << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "SQL error in getAllProducts: " << sqlite3_errmsg(db) << std::endl;
     }
 
-    sqlite3_finalize(stmt);
     return products;
 }
 
 Product Product::getProductById(int id) {
     Product product;
-
     sqlite3* db = Database::getConnection();
+    sqlite3_stmt* stmt = nullptr;
 
     const char* sql = R"(
-        SELECT *
+        SELECT id, sku, name, description, price, quantity, min_quantity
         FROM products
         WHERE id = ?
     )";
-
-    sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
         sqlite3_bind_int(stmt, 1, id);
@@ -107,17 +102,18 @@ Product Product::getProductById(int id) {
             product.quantity = sqlite3_column_int(stmt, 5);
             product.min_quantity = sqlite3_column_int(stmt, 6);
         }
+        sqlite3_finalize(stmt);
     } else {
-        std::cerr << "SQL error in findById: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "SQL error in getProductById: " << sqlite3_errmsg(db) << std::endl;
     }
 
-    sqlite3_finalize(stmt);
     return product;
 }
 
 Product Product::getProductBySku(const std::string& sku) {
     Product product; // Default constructor sets id = 0
     sqlite3* db = Database::getConnection();
+    sqlite3_stmt* stmt = nullptr;
 
     const char* sql = R"(
         SELECT id, sku, name, description, price, quantity, min_quantity
@@ -125,9 +121,7 @@ Product Product::getProductBySku(const std::string& sku) {
         WHERE sku = ?
     )";
 
-    sqlite3_stmt* stmt;
-
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
         sqlite3_bind_text(stmt, 1, sku.c_str(), -1, SQLITE_STATIC);
 
         if (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -146,11 +140,11 @@ Product Product::getProductBySku(const std::string& sku) {
             product.quantity = sqlite3_column_int(stmt, 5);
             product.min_quantity = sqlite3_column_int(stmt, 6);
         }
+        sqlite3_finalize(stmt);
     } else {
-        std::cerr << "SQL error in findBySku: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "SQL error in getProductBySku: " << sqlite3_errmsg(db) << std::endl;
     }
 
-    sqlite3_finalize(stmt);
     return product;
 }
 
@@ -161,7 +155,7 @@ bool Product::save() {
     }
 
     sqlite3* db = Database::getConnection();
-    sqlite3_stmt* stmt;
+    sqlite3_stmt* stmt = nullptr;
 
     if (id == 0) {
         // INSERT new product
@@ -185,6 +179,7 @@ bool Product::save() {
             } else {
                 std::cerr << "INSERT error: " << sqlite3_errmsg(db) << std::endl;
             }
+            sqlite3_finalize(stmt);
         } else {
             std::cerr << "SQL prepare error: " << sqlite3_errmsg(db) << std::endl;
         }
@@ -213,12 +208,12 @@ bool Product::save() {
             } else {
                 std::cerr << "UPDATE error: " << sqlite3_errmsg(db) << std::endl;
             }
+            sqlite3_finalize(stmt);
         } else {
             std::cerr << "SQL prepare error: " << sqlite3_errmsg(db) << std::endl;
         }
     }
 
-    sqlite3_finalize(stmt);
     return false;
 }
 
@@ -228,7 +223,7 @@ bool Product::remove() {
     }
 
     sqlite3* db = Database::getConnection();
-    sqlite3_stmt* stmt;
+    sqlite3_stmt* stmt = nullptr;
 
     const char* sql = "DELETE FROM products WHERE id = ?";
 
@@ -242,11 +237,11 @@ bool Product::remove() {
         } else {
             std::cerr << "DELETE error: " << sqlite3_errmsg(db) << std::endl;
         }
+        sqlite3_finalize(stmt);
     } else {
         std::cerr << "SQL prepare error: " << sqlite3_errmsg(db) << std::endl;
     }
 
-    sqlite3_finalize(stmt);
     return false;
 }
 
@@ -289,4 +284,3 @@ bool Product::isValid() const {
 
     return true;
 }
-
