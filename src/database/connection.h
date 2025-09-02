@@ -7,10 +7,10 @@
 class Database {
 public:
     static void initialise(const std::string& dbPath);
-    static sqlite3* getConnection();
+    static sqlite3* getConnection() {return db;}
     static void runMigrations();
     static int close();
-    static bool isInitialised();
+    static bool isInitialised() {return initialised;}
     ~Database();
 
 

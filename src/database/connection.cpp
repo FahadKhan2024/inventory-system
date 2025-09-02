@@ -23,14 +23,6 @@ void Database::initialise(const std::string &dbPath) {
     std::cout << "Database initialised successfully" << std::endl;
 }
 
-sqlite3* Database::getConnection() {
-    return db;
-}
-
-bool Database::isInitialised() {
-    return initialised;
-}
-
 void Database::runMigrations() {
     std::ifstream file("src/database/migrations/001_initial_schema.sql");
 
@@ -54,7 +46,7 @@ void Database::runMigrations() {
 }
 
 int Database::close() {
-    if (!initialised) {
+    if (isInitialised()) {
         std::cout << "Database already closed" << std::endl;
         return -1;
     }
